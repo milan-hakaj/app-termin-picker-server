@@ -13,6 +13,7 @@ const app = express();
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
+/* TODO use morgan only if environment is dev :) */
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
