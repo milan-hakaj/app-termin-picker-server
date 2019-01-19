@@ -24,6 +24,13 @@ app.use((req, res, next) => {
   next();
 });
 
+const router = express.Router();
+
+router.get('/',(req, res, next) => {
+    res.status(200).json({ lal : "lele"});
+});
+
+
 app.use('/users', routesUser);
 
 mongoose
