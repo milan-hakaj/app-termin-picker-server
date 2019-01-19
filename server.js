@@ -4,7 +4,7 @@ const port = process.env.PORT ||  3000
 
 const requestHandler = (request, response) => {
   console.log(request.url)
-  response.end('Hello Node.js Server!')
+  response.end('Hello from sporty api!')
 }
 
 const server = http.createServer(requestHandler)
