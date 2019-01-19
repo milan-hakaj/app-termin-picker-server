@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.use('/users', routesUser);
 
 mongoose
-  .connect(process.env.MONGODB_CONNECTION_STRING, {
+  .connect('mongodb://node-user:node-user-password@node-rest-mongodb-shard-00-00-teyic.mongodb.net:27017,node-rest-mongodb-shard-00-01-teyic.mongodb.net:27017,node-rest-mongodb-shard-00-02-teyic.mongodb.net:27017/test?ssl=true&replicaSet=node-rest-mongodb-shard-0&authSource=admin&retryWrites=true', {
     useNewUrlParser: true
   }).then(() => console.log('mongoose ok'))
     .catch(() => console.log('mongoose error'));
