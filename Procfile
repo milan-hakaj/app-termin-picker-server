@@ -1,1 +1,1 @@
-web: npm run build-dev
+web: node server.js
