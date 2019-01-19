@@ -7,7 +7,7 @@
     "npm": "6.4.1"
   },
   "scripts": {
-    "build-dev": "nodemon server.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
