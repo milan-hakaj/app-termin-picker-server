@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 const morgan     = require('morgan');
 
 const routesUser = require('./api/routes/users');
+const routesLocation = require('./api/routes/locations');
+const routesCountry = require('./api/routes/countries');
+const routesCities = require('./api/routes/cities');
 
 const app = express();
 
@@ -26,7 +29,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/locations', routesLocation);
 app.use('/users', routesUser);
+app.use('/countries', routesCountry);
+app.use('/cities', routesCities);
 
 mongoose
   .connect(process.env.MONGO_URI, {
