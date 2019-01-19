@@ -1,0 +1,16 @@
+{
+  "name": "Sporty NodeJs React App",
+  "version": "1",
+  "description": "Nodejs, Mongoose, Express, React",
+  "main": "server.js",
+  "engines": {
+    "node": "10.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "license": "MIT"
+}
