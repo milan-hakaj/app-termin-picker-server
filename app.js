@@ -8,6 +8,8 @@ const routesUser = require('./api/routes/users');
 
 const app = express();
 
+app.get('/', (req, res) => res.send('Hello World!'))
+
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -23,13 +25,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-const router = express.Router();
-
-router.get('/',(req, res, next) => {
-    res.status(200).json({ lal : "lele"});
-});
-
 
 app.use('/users', routesUser);
 
