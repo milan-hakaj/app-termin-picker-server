@@ -124,9 +124,9 @@ router.delete('/', (req, res, next) => {
       }
 
       res.status(202).json(user);
-    }).catch((e) => {
+    }).catch(() => {
       res.status(500).json({
-        error: "Oops, error while trying to remove user.", e
+        error: "Oops, error while trying to remove user."
       });
     });
 });
@@ -143,9 +143,9 @@ router.get('/:id', (req, res, next) => {
       }
 
       res.status(200).json(user);
-  }).catch((error) => {
+  }).catch(() => {
     res.status(500).json({
-      error: "We couldn't find user with given ID."
+      error: "Oops, we couldn't find user with given ID."
     });
   });
 });
