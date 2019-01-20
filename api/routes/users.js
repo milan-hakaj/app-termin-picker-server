@@ -162,17 +162,25 @@ router.put('/:id', (req, res, next) => {
     });
   }
 
-  User
-    .findOneAndUpdate({_id: req.params.id}, req.body, { upsert: true })
-    .then((user) => {
-      console.log('usa', user);
-      return res.status(200).json(user)
-    })
-    .catch(() => {
-      return res.status(500).json({
-        error: "Error while trying to update user details."
-      })
-    });
+  bcrypt.hash(req.body.password, null, null, (error, hash) => {
+    if (error) {
+      return res.status(500).json({ error: error });
+    } else {
+      req.body.password = hash;
+
+      User
+        .findOneAndUpdate({_id: req.params.id}, req.body, { upsert: true })
+        .then((user) => {
+
+          return res.status(200).json(user)
+        })
+        .catch(() => {
+          return res.status(500).json({
+            error: "Error while trying to update user details."
+          })
+        });
+    }
+  });
 });
 
 module.exports = router;
