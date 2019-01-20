@@ -11,15 +11,10 @@ clone:
 pipelines:
   default:
     - step:
-        name: Deploy to test
-        deployment: test  
-        script:
-          - echo "Deploying to test environment"
-
-    - step:
+        name: Deploying to Heroku
+        deployment: staging
         caches:
           - node
-        script: 
+        script:
+          - echo "Deploying to heroku staging environment"
           - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
-#          - npm install
-#          - npm test
