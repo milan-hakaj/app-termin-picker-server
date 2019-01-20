@@ -1,8 +1,8 @@
+require('dotenv').config()
 const express = require('express');
 const router = express.Router();
 const authGuard = require('../middleware/auth-guard');
-const userController = require('../controllers/users');
-const { User, validate } = require('../models/User');
+const { User, validate, validateLogin } = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('jsonwebtoken');
@@ -16,7 +16,7 @@ router.get('/', /*authGuard, */(req, res, next) => {
   });
 });
 
-router.post('/new', (req, res, next) => {
+router.post('/create', (req, res, next) => {
 
   const { error } = validate(req.body);
 
@@ -60,7 +60,7 @@ router.post('/new', (req, res, next) => {
 
 router.post('/login', (req, res) => {
 
-  const { error } = validate(req.body);
+  const { error } = validateLogin(req.body);
 
   if (error) {
     return res.status(400).send({
@@ -91,7 +91,7 @@ router.post('/login', (req, res) => {
             phone: user.phone,
             firstName: user.firstName,
             lastName: user.lastName
-          }, 'JWT_SECRET_KEY_NAME', {
+          }, process.env.JWT_SECRET_KEY, {
             expiresIn: '1h'
           });
 

@@ -27,5 +27,14 @@ validateUser = (userData) => {
   return Joi.validate(userData, schema);
 };
 
+validateUserLogin = (userData) => {
+  const schema = {
+    email: Joi.string().min(5).required().email({ minDomainAtoms: 2 }),
+    password: Joi.string()
+  };
+  return Joi.validate(userData, schema);
+};
+
 exports.User = mongoose.model('User', userSchema);
 exports.validate = validateUser;
+exports.validateLogin = validateUserLogin;
