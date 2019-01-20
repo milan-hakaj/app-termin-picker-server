@@ -11,7 +11,7 @@ const routesCities = require('./api/routes/cities');
 
 const app = express();
 
-app.get('/', (req, res) => res.send('Hello World 2'))
+app.get('/', (req, res) => res.send('Hello World 3'))
 
 /* TODO use morgan only if environment is dev :) */
 app.use(morgan('dev'));
