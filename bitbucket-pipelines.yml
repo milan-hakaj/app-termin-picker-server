@@ -11,6 +11,12 @@ clone:
 pipelines:
   default:
     - step:
+        name: Deploy to test
+        deployment: test  
+        script:
+          - echo "Deploying to test environment"
+
+    - step:
         caches:
           - node
         script: 
