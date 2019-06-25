@@ -17,7 +17,6 @@ router.get('/', /*authGuard, */(req, res, next) => {
 });
 
 router.post('/create', (req, res, next) => {
-
   const { error } = validate(req.body);
 
   if (error) {
@@ -26,36 +25,45 @@ router.post('/create', (req, res, next) => {
     });
   }
 
+  console.log(req.body.socialMediaData);
+
   User
-    .find({ email: req.body.email })
+    .where({ 'socialMediaData.id': req.body.socialMediaData.id })
     .exec()
     .then((users) => {
-      if (users.length >= 1) {
-        return res.status(409).json({
-          error: "Oops, we already have your email address."
-        })
-      } else {
-        bcrypt.hash(req.body.password, null, null, (error, hash) => {
-          if (error) {
-            return res.status(500).json({ error: error });
-          } else {
-            const user = new User({
-              _id: new mongoose.Types.ObjectId(),
-              email: req.body.email,
-              password: hash
-            });
-
-            user.save().then((user) => {
-              res.status(200).json(user);
-            }).catch((error) => {
-              res.status(500).json({ error: error });
-            });
+      if (users.length === 0) {
+        const user = new User({
+          _id: new mongoose.Types.ObjectId(),
+          name: req.body.name,
+          picture: req.body.picture,
+          email: req.body.email,
+          socialMediaData: {
+            id: req.body.socialMediaData.id,
+            name: req.body.socialMediaData.name
           }
         });
+
+        user.save()
+          .then(user => res.status(200).json(user))
+          .catch(error => res.status(500).json({ error: error }));
+      } else {
+        const user = users[0];
+        const token = jwt.sign({
+          _id: user.id,
+          picture: user.picture,
+          email: user.email,
+        }, process.env.JWT_SECRET_KEY, {
+          expiresIn: '1h'
+        });
+
+        return res.status(200).json({
+          success: 'Authentication successful.',
+          token
+        })
       }
     }).catch((error) => {
-    res.status(500).json({ error });
-  });
+      res.status(500).json({ error });
+    });
 });
 
 router.post('/login', (req, res) => {
@@ -90,7 +98,8 @@ router.post('/login', (req, res) => {
             email: user.email,
             phone: user.phone,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
+            password: user.password
           }, process.env.JWT_SECRET_KEY, {
             expiresIn: '1h'
           });
@@ -106,12 +115,10 @@ router.post('/login', (req, res) => {
     });
 });
 
-/**
- * TODO
- * Add authguard here so only authed users can delete
- * themselves by entering their email (like github repo
- * removal).
- */
+// User.remove({}, function(err) {
+//   console.log('collection removed')
+// });
+
 router.delete('/', (req, res, next) => {
   User
     .findOneAndRemove({ email: req.body.email })

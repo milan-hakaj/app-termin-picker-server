@@ -1,8 +1,20 @@
-const http = require('http');
 const app = require('./app');
+const httpServer = require('http').Server(app);
+const io = require('socket.io')(httpServer);
 
-const port = process.env.PORT || 3002;
+httpServer.listen(3001);
 
-const server = http.createServer(app);
+const MESSAGE = '[Message]';
+const MESSAGE_CHANGE = `${MESSAGE} CHANGE`;
+const MESSAGE_SEND = `${MESSAGE} SEND`;
+const MESSAGE_RECEIVE = `${MESSAGE} RECEIVE`;
+const MESSAGE_NEW = `${MESSAGE} NEW`;
 
-server.listen(port);
+io.on('connection', function(socket){
+  console.log('a user connected1', socket.id);
+  socket.on(MESSAGE_SEND, function(message){
+    console.log('a user sent message2 -> ' + message);
+    socket.broadcast.emit(MESSAGE_NEW, message);
+  });
+});
+
