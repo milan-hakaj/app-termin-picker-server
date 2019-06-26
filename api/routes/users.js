@@ -16,7 +16,7 @@ router.get('/', /*authGuard, */(req, res, next) => {
   });
 });
 
-router.post('/create', (req, res, next) => {
+router.post('/auth', (req, res, next) => {
   const { error } = validate(req.body);
 
   if (error) {
@@ -24,8 +24,6 @@ router.post('/create', (req, res, next) => {
       error: error.details[0].message
     });
   }
-
-  console.log(req.body.socialMediaData);
 
   User
     .where({ 'socialMediaData.id': req.body.socialMediaData.id })
@@ -44,7 +42,20 @@ router.post('/create', (req, res, next) => {
         });
 
         user.save()
-          .then(user => res.status(200).json(user))
+          .then(user => {
+            const token = jwt.sign({
+              _id: user.id,
+              picture: user.picture,
+              email: user.email,
+            }, process.env.JWT_SECRET_KEY, {
+              expiresIn: '1h'
+            });
+
+            return res.status(200).json({
+              success: 'New user created & authentication successful.',
+              token
+            })
+          })
           .catch(error => res.status(500).json({ error: error }));
       } else {
         const user = users[0];
