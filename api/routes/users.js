@@ -25,6 +25,8 @@ router.post('/auth', (req, res, next) => {
     });
   }
 
+  console.log(req.body);
+
   User
     .where({ 'socialMediaData.id': req.body.socialMediaData.id })
     .exec()
@@ -46,6 +48,7 @@ router.post('/auth', (req, res, next) => {
             const token = jwt.sign({
               _id: user.id,
               picture: user.picture,
+              name: user.name,
               email: user.email,
             }, process.env.JWT_SECRET_KEY, {
               expiresIn: '1h'
@@ -62,6 +65,7 @@ router.post('/auth', (req, res, next) => {
         const token = jwt.sign({
           _id: user.id,
           picture: user.picture,
+          name: user.name,
           email: user.email,
         }, process.env.JWT_SECRET_KEY, {
           expiresIn: '1h'
