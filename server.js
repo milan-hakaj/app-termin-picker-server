@@ -4,17 +4,17 @@ const io = require('socket.io')(httpServer);
 
 httpServer.listen(3001);
 
-const MESSAGE = '[Message]';
-const MESSAGE_CHANGE = `${MESSAGE} CHANGE`;
-const MESSAGE_SEND = `${MESSAGE} SEND`;
-const MESSAGE_RECEIVE = `${MESSAGE} RECEIVE`;
-const MESSAGE_NEW = `${MESSAGE} NEW`;
+const DM = '[DM]';
+const DM_DETECTED = `${DM} ON DETECTED`;
+const DM_SEND = `${DM} SEND`;
+const DM_RECEIVE = `${DM} RECEIVE`;
+const DM_NEW = `${DM} NEW`;
 
 io.on('connection', function(socket){
   console.log('a user connected1', socket.id);
-  socket.on(MESSAGE_SEND, function(message){
-    console.log('a user sent message2 -> ' + message);
-    socket.broadcast.emit(MESSAGE_NEW, message);
+  socket.on(DM_SEND, function(messageData){
+    console.log('a user sent message2 -> ', messageData);
+    socket.broadcast.emit(DM_NEW, messageData);
   });
 });
 
