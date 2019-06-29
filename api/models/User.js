@@ -34,6 +34,7 @@ validateUserLogin = (userData) => {
   return Joi.validate(userData, schema);
 };
 
+
 exports.User = mongoose.model('User', userSchema);
 exports.validate = validateUser;
 exports.validateLogin = validateUserLogin;
