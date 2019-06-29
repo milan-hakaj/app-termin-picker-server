@@ -5,7 +5,7 @@ const DMSchema = Schema({
   _id: mongoose.Schema.Types.String,
   messages: [{
     type: Schema.Types.ObjectId,
-    ref: 'MessageDM'
+    ref: 'Message'
   }]
 });
 

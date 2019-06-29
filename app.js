@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const morgan     = require('morgan');
 
 const routesUser = require('./api/routes/users');
-const routesDM = require('./api/routes/directMessages');
+const routesDM = require('./api/routes/dm');
 
 const app = express();
 

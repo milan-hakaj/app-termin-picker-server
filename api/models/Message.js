@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const MessageDMSchema = Schema({
+const MessageSchema = Schema({
   _id: mongoose.Schema.Types.ObjectId,
   receiverId: { type: Schema.Types.ObjectId, ref: 'User' },
   senderId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -9,5 +9,4 @@ const MessageDMSchema = Schema({
   timestamp: { type: Schema.Types.String }
 });
 
-module.exports.MessageDM = mongoose.model('MessageDM', MessageDMSchema);
-// module.exports.DM = mongoose.model('DM', DMSchema);
+module.exports.Message = mongoose.model('Message', MessageSchema);
