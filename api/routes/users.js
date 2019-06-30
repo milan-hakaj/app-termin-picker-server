@@ -155,7 +155,7 @@ router.delete('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
   User
-    .findById(req.params.id)
+    .find({ _id: req.params.id })
     .exec()
     .then((user) => {
       if (!user) {
