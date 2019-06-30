@@ -44,8 +44,8 @@ router.post('/', (req, res, next) => {
     .catch(error => res.status({ error }));
 });
 
-router.get('/', (req, res, next) => {
-  DM.find()
+router.get('/inbox/:id', (req, res, next) => {
+  DM.find({ _id : { $regex: req.params.id } })
     .populate('messages')
     .exec()
     .then(response => res.status(200).json(response))
