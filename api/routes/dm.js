@@ -27,13 +27,13 @@ router.post('/', (req, res, next) => {
             messages: []
           });
 
-          responseDM.messages.push(message);
-
           if (responseDM) {
+            responseDM.messages.push(message);
             responseDM.save()
               .then(response => res.status(200).json(response))
               .catch(error => res.status({ error }));
           } else {
+            DMThread.messages.push(message);
             DMThread.save()
               .then(response => res.status(200).json(response))
               .catch(error => res.status({ error }));
@@ -53,7 +53,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  DM.findOne({ _id: req.body.id })
+  DM.findOne({ _id: req.params.id })
     .populate('messages')
     .exec()
     .then(response => res.status(200).json(response))
