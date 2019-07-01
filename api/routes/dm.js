@@ -24,6 +24,10 @@ router.post('/', (req, res, next) => {
         .then(responseDM => {
           let DMThread = new DM({
             _id: DMID,
+            participants: [
+              mongoose.Types.ObjectId(senderId),
+              mongoose.Types.ObjectId(receiverId)
+            ],
             messages: []
           });
 
@@ -44,9 +48,12 @@ router.post('/', (req, res, next) => {
     .catch(error => res.status({ error }));
 });
 
-router.get('/inbox/:id', (req, res, next) => {
+router.get('/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } })
-    .populate({
+    .populate([{
+        path: 'participants'
+      },
+      {
       path: 'messages',
       populate: [{
         path: 'senderId',
@@ -55,18 +62,18 @@ router.get('/inbox/:id', (req, res, next) => {
         path: 'receiverId',
         model: 'User',
       }]
-    })
+    }])
     .exec()
     .then(response => res.status(200).json(response))
     .catch(error => res.status(500).json({ error }));
 });
 
-router.get('/:id', (req, res, next) => {
-  DM.findOne({ _id: req.params.id })
-    .populate('messages')
-    .exec()
-    .then(response => res.status(200).json(response))
-    .catch(error => res.status(500).json({ error }));
-});
+// router.get('/:id', (req, res, next) => {
+//   DM.findOne({ _id: req.params.id })
+//     .populate('messages')
+//     .exec()
+//     .then(response => res.status(200).json(response))
+//     .catch(error => res.status(500).json({ error }));
+// });
 
 module.exports = router;

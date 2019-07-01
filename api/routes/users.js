@@ -158,13 +158,13 @@ router.get('/:id', (req, res, next) => {
     .find({ _id: req.params.id })
     .exec()
     .then((user) => {
-      if (!user) {
+      if (!user.length) {
         res.status(404).json({
           error: "We couldn't find user with given ID."
         });
       }
 
-      res.status(200).json(user);
+      res.status(200).json(user[0]);
   }).catch(() => {
     res.status(500).json({
       error: "Oops, we couldn't find user with given ID."
