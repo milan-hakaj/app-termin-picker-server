@@ -68,6 +68,7 @@ router.get('/:id', (req, res, next) => {
     .catch(error => res.status(500).json({ error }));
 });
 
+// pagination, load more, etc...
 // router.get('/:id', (req, res, next) => {
 //   DM.findOne({ _id: req.params.id })
 //     .populate('messages')
