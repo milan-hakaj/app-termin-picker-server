@@ -6,11 +6,11 @@ const { Message } = require('../models/Message');
 const mongoose = require('mongoose');
 
 router.post('/', (req, res, next) => {
-  const { receiverId, senderId, message : text, timestamp } = req.body;
+  const { _id, receiverId, senderId, message : text, timestamp } = req.body;
   const DMID = getDMID(senderId, receiverId);
 
   const message = new Message({
-    _id: new mongoose.Types.ObjectId(),
+    _id,
     receiverId,
     senderId,
     message: text,
