@@ -56,19 +56,9 @@ router.post('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } })
-    .populate([{
+    .populate({
         path: 'participants'
-      },
-      {
-      path: 'messages',
-      populate: [{
-        path: 'senderId',
-        model: 'User',
-      }, {
-        path: 'receiverId',
-        model: 'User',
-      }]
-    }])
+    })
     .exec()
     .then(response => res.status(200).json(response))
     .catch(error => res.status(500).json({ error }));
