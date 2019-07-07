@@ -30,18 +30,24 @@ router.post('/', (req, res, next) => {
             ],
             messages: []
           });
-
           if (responseDM) {
             responseDM.messages.push(message);
             responseDM.save()
-              .then(response => res.status(200).json(response))
-              .catch(error => res.status({ error }));
+                      .then()
+                      .catch(error => res.status({ error }));
           } else {
             DMThread.messages.push(message);
-            DMThread.save()
-              .then(response => res.status(200).json(response))
+            DMThread
+              .save()
               .catch(error => res.status({ error }));
           }
+
+          Message.populate(message, [ { path: 'senderId'}, { path: 'receiverId' } ] )
+            .then(savedMessage => res.status(200).json({
+              savedMessage,
+              DMID
+            }))
+            .catch(error => res.status({ error }));
         })
         .catch(error => res.status({ error }));
     })
