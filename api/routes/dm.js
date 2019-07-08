@@ -33,21 +33,22 @@ router.post('/', (req, res, next) => {
           if (responseDM) {
             responseDM.messages.push(message);
             responseDM.save()
-                      .then()
+                      .then(() => res.status(200))
                       .catch(error => res.status({ error }));
           } else {
             DMThread.messages.push(message);
             DMThread
               .save()
+              .then(() => res.status(200))
               .catch(error => res.status({ error }));
           }
 
-          Message.populate(message, [ { path: 'senderId'}, { path: 'receiverId' } ] )
-            .then(savedMessage => res.status(200).json({
-              savedMessage,
-              DMID
-            }))
-            .catch(error => res.status({ error }));
+          // Message.populate(message, [ { path: 'senderId'}, { path: 'receiverId' } ] )
+          //   .then(savedMessage => res.status(200).json({
+          //     savedMessage,
+          //     DMID
+          //   }))
+          //   .catch(error => res.status({ error }));
         })
         .catch(error => res.status({ error }));
     })
@@ -55,10 +56,20 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  DM.find({ _id : { $regex: req.params.id } })
-    .populate({
+  DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
+    .populate([{
         path: 'participants'
-    })
+      },
+      {
+      path: 'messages',
+      // populate: [{
+      //   path: 'senderId',
+      //   model: 'User',
+      // }, {
+      //   path: 'receiverId',
+      //   model: 'User',
+      // }]
+    }])
     .exec()
     .then(response => res.status(200).json(response))
     .catch(error => res.status(500).json({ error }));
