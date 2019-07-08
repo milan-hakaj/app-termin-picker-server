@@ -22,11 +22,12 @@ router.post('/', (req, res, next) => {
     .save()
     .then(messageData => messageData)
     .then(messageData => {
-      DM.update({ _id: DMID }, {
+      DM.updateOne({ _id: DMID }, {
         $push: {
           messages: messageData
         }
-      }).then((res) => res.status(200).json({
+      })
+      .then(() => res.status(200).json({
         messageData,
         DMID
       }))
