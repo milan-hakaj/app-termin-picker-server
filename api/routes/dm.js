@@ -1,87 +1,38 @@
 require('dotenv').config()
 const express = require('express');
 const router = express.Router();
-const { DM, getDMID } = require('../models/DM');
-const { Message } = require('../models/Message');
+const { DM } = require('../models/DM');
 const mongoose = require('mongoose');
 
 router.post('/', (req, res, next) => {
-  const { _id, receiverId, senderId, message : text, timestamp } = req.body;
-  const DMID = getDMID(senderId, receiverId);
+  const { receiverId, senderId, DMID } = req.body;
 
-  const message = new Message({
-    _id,
-    receiverId,
-    senderId,
-    message: text,
-    timestamp
+  const DirectMessage = new DM({
+    _id: DMID,
+    participants: [
+      mongoose.Types.ObjectId(senderId),
+      mongoose.Types.ObjectId(receiverId)
+    ],
+    messages: []
   });
 
-  message.save()
-    .then(message => {
-      DM.findOne({ _id: DMID })
-        .exec()
-        .then(responseDM => {
-          let DMThread = new DM({
-            _id: DMID,
-            participants: [
-              mongoose.Types.ObjectId(senderId),
-              mongoose.Types.ObjectId(receiverId)
-            ],
-            messages: []
-          });
-          if (responseDM) {
-            responseDM.messages.push(message);
-            responseDM.save()
-                      .then(() => res.status(200))
-                      .catch(error => res.status({ error }));
-          } else {
-            DMThread.messages.push(message);
-            DMThread
-              .save()
-              .then(() => res.status(200))
-              .catch(error => res.status({ error }));
-          }
-
-          // Message.populate(message, [ { path: 'senderId'}, { path: 'receiverId' } ] )
-          //   .then(savedMessage => res.status(200).json({
-          //     savedMessage,
-          //     DMID
-          //   }))
-          //   .catch(error => res.status({ error }));
-        })
-        .catch(error => res.status({ error }));
-    })
-    .catch(error => res.status({ error }));
+  DirectMessage
+    .save()
+    .then(DirectMessage => DirectMessage.populate('participants').execPopulate())
+    .then(DirectMessage => res.status(200).json({ DM: DirectMessage }))
+    .catch(error => res.status(500).json({ error }));
 });
 
 router.get('/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
     .populate([{
         path: 'participants'
-      },
-      {
-      path: 'messages',
-      // populate: [{
-      //   path: 'senderId',
-      //   model: 'User',
-      // }, {
-      //   path: 'receiverId',
-      //   model: 'User',
-      // }]
+      }, {
+        path: 'messages',
     }])
     .exec()
     .then(response => res.status(200).json(response))
     .catch(error => res.status(500).json({ error }));
 });
-
-// pagination, load more, etc...
-// router.get('/:id', (req, res, next) => {
-//   DM.findOne({ _id: req.params.id })
-//     .populate('messages')
-//     .exec()
-//     .then(response => res.status(200).json(response))
-//     .catch(error => res.status(500).json({ error }));
-// });
 
 module.exports = router;
