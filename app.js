@@ -6,6 +6,7 @@ const morgan     = require('morgan');
 
 const routesUser = require('./api/routes/users');
 const routesDM = require('./api/routes/dm');
+const routesMessage = require('./api/routes/message');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 
 app.use('/api/users', routesUser);
 app.use('/api/dm', routesDM);
+app.use('/api/messages', routesMessage);
 
 mongoose
   .connect(process.env.MONGO_URI, {
