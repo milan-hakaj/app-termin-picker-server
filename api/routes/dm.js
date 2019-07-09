@@ -16,15 +16,26 @@ router.post('/', (req, res, next) => {
     messages: []
   });
 
-  DirectMessage
-    .save()
-    .then(DirectMessage => DirectMessage.populate('participants').execPopulate())
-    .then(DirectMessage => res.status(200).json({ DM: DirectMessage }))
-    .catch(error => res.status(500).json({ error }));
+  DM.findOne({ _id: DMID })
+    .then(result => {
+      if (result) {
+        result.populate('participants').execPopulate()
+          .then(DM => res.status(200).json({ DM }))
+          .catch(error => res.status(500).json({ error }))
+      } else {
+        DirectMessage
+          .save()
+          .then(DirectMessage => DirectMessage.populate('participants').execPopulate())
+          .then(DirectMessage => res.status(200).json({ DM: DirectMessage }))
+          .catch(error => res.status(500).json({ error }));
+      }
+    })
+    .catch(error => res.status(500).json({ error }))
 });
 
 router.get('/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
+    // .limit(1)
     .populate([{
         path: 'participants'
       }, {
