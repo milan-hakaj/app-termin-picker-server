@@ -62,4 +62,18 @@ router.post('/next/:id', (req, res, next) => {
     .catch(error => res.status(500).json({ error }));
 });
 
+router.delete('/:id', (req, res, next) => {
+  const DMID = req.params.id;
+
+  console.log('dmid', DMID);
+  DM.remove({ _id: DMID })
+    .exec()
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({ DMID })
+    })
+    .catch((error) => res.status(500).json({ error }));
+});
+
+
 module.exports = router;
