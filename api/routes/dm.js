@@ -6,18 +6,9 @@ const mongoose = require('mongoose');
 const NUMBER_OF_DM_PER_REQUEST = 1;
 
 router.post('/', (req, res, next) => {
-  const { receiverId, senderId, DMID } = req.body;
+  const DirectMessage = new DM(req.body.DM);
 
-  const DirectMessage = new DM({
-    _id: DMID,
-    participants: [
-      mongoose.Types.ObjectId(senderId),
-      mongoose.Types.ObjectId(receiverId)
-    ],
-    messages: []
-  });
-
-  DM.findOne({ _id: DMID })
+  DM.findOne({ _id: DirectMessage._id })
     .then(result => {
       if (result) {
         result.populate('participants').execPopulate()
@@ -35,7 +26,6 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  console.log('calin');
   DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
     .limit(NUMBER_OF_DM_PER_REQUEST)
     .populate([{
@@ -65,13 +55,9 @@ router.post('/next/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
   const DMID = req.params.id;
 
-  console.log('dmid', DMID);
   DM.remove({ _id: DMID })
     .exec()
-    .then((result) => {
-      console.log(result);
-      res.status(200).json({ DMID })
-    })
+    .then(() => res.status(200).json({ DMID }))
     .catch((error) => res.status(500).json({ error }));
 });
 
