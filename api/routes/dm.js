@@ -27,7 +27,7 @@ router.post('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
-    .limit(NUMBER_OF_DM_PER_REQUEST)
+    // .limit(NUMBER_OF_DM_PER_REQUEST)
     .populate([{
         path: 'participants'
       }, {
