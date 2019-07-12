@@ -25,7 +25,7 @@ router.post('/', (req, res, next) => {
     .catch(error => res.status(500).json({ error }))
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/list/:id', (req, res, next) => {
   DM.find({ _id : { $regex: req.params.id } }, { messages: { $slice: -10 } })
     // .limit(NUMBER_OF_DM_PER_REQUEST)
     .populate([{
@@ -35,6 +35,21 @@ router.get('/:id', (req, res, next) => {
     }])
     .exec()
     .then(response => res.status(200).json(response))
+    .catch(error => res.status(500).json({ error }));
+});
+
+router.post('/:id', (req, res, next) => {
+  DM.findOne({ _id : req.params.id }, { messages: { $slice: -10 } })
+    .populate([{
+      path: 'participants'
+    }, {
+      path: 'messages',
+    }])
+    .exec()
+    .then(result => res.status(200).json({
+      DM: result,
+      shouldAddToList: req.body.shouldAddToList
+    }))
     .catch(error => res.status(500).json({ error }));
 });
 

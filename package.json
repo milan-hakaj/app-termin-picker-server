@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-rest-api-mongoose",
+  "name": "hey-node-rest-api-mongoose",
   "version": "1.0.0",
   "main": "server.js",
   "engines": {
