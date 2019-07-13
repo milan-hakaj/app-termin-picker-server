@@ -29,5 +29,10 @@ io.on('connection', function(socket){
     socket.to(otherSocket).emit('DIRECT_MESSAGE_RECEIVED', data);
   });
 
+  socket.on('USER_STARTED_TYPING', function(data) {
+    const otherSocket = socketsHandler[data.to];
+    socket.to(otherSocket).emit('USER_IS_TYPING', data);
+  });
+
 });
 
