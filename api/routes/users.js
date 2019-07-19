@@ -25,8 +25,6 @@ router.post('/auth', (req, res, next) => {
     });
   }
 
-  console.log(req.body);
-
   User
     .where({ 'socialMediaData.id': req.body.socialMediaData.id })
     .exec()
@@ -81,58 +79,58 @@ router.post('/auth', (req, res, next) => {
     });
 });
 
-router.post('/login', (req, res) => {
-
-  const { error } = validateLogin(req.body);
-
-  if (error) {
-    return res.status(400).send({
-      error: error.details[0].message
-    });
-  }
-
-  User
-    .findOne({ email: req.body.email })
-    .exec()
-    .then((user) => {
-      if (!user) {
-        return res.status(401).json({
-          error: "We couldn't find this one. "
-        });
-      }
-
-      bcrypt.compare(req.body.password, user.password, (error, response) => {
-          if(!response) {
-            return res.status(400).json({
-              error: 'Username or password incorrect'
-            })
-          }
-
-          const token = jwt.sign({
-            _id: user.id,
-            email: user.email,
-            phone: user.phone,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            password: user.password
-          }, process.env.JWT_SECRET_KEY, {
-            expiresIn: '1h'
-          });
-
-          return res.status(200).json({
-            success: 'Authentication successful.',
-            token
-          })
-
-      });
-    }).catch(() => {
-      res.status(500).json({ error: "We couldn't find this one." });
-    });
-});
-
-// User.remove({}, function(err) {
-//   console.log('collection removed')
+// router.post('/login', (req, res) => {
+//
+//   const { error } = validateLogin(req.body);
+//
+//   if (error) {
+//     return res.status(400).send({
+//       error: error.details[0].message
+//     });
+//   }
+//
+//   User
+//     .findOne({ email: req.body.email })
+//     .exec()
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(401).json({
+//           error: "We couldn't find this one. "
+//         });
+//       }
+//
+//       bcrypt.compare(req.body.password, user.password, (error, response) => {
+//           if(!response) {
+//             return res.status(400).json({
+//               error: 'Username or password incorrect'
+//             })
+//           }
+//
+//           const token = jwt.sign({
+//             _id: user.id,
+//             email: user.email,
+//             phone: user.phone,
+//             firstName: user.firstName,
+//             lastName: user.lastName,
+//             password: user.password
+//           }, process.env.JWT_SECRET_KEY, {
+//             expiresIn: '1h'
+//           });
+//
+//           return res.status(200).json({
+//             success: 'Authentication successful.',
+//             token
+//           })
+//
+//       });
+//     }).catch(() => {
+//       res.status(500).json({ error: "We couldn't find this one." });
+//     });
 // });
+//
+// // User.remove({}, function(err) {
+// //   console.log('collection removed')
+// // });
 
 router.delete('/', (req, res, next) => {
   User
