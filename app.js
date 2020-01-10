@@ -1,17 +1,22 @@
-require('dotenv').config()
-const express    = require('express');
-const mongoose   = require('mongoose');
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const morgan     = require('morgan');
-
+const morgan = require('morgan');
+const http = require('http');
 const routesUser = require('./api/routes/users');
 const routesDM = require('./api/routes/dm');
 const routesMessage = require('./api/routes/message');
 const routesViewer = require('./api/routes/views');
-
+const routesTermin = require('./api/routes/termins');
 const app = express();
+const socketIo = require('socket.io');
 
-app.get('/', (req, res) => res.send('Hello World 4'))
+var httpServer = http.Server(app);
+
+// httpServer.listen(3001);
+
+app.get('/', (req, res) => res.send('Hello World 4'));
 
 /* TODO use morgan only if environment is dev :) */
 app.use(morgan('dev'));
@@ -24,7 +29,7 @@ app.use((req, res, next) => {
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
 
-  if(req.method === 'OPTIONS') {
+  if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
   }
   next();
@@ -34,12 +39,14 @@ app.use('/api/users', routesUser);
 app.use('/api/dm', routesDM);
 app.use('/api/messages', routesMessage);
 app.use('/api/views', routesViewer);
+app.use('/api/termin', routesTermin);
 
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true
-  }).then(() => console.log('mongoose ok'))
-    .catch(() => console.log('mongoose error'));
+  })
+  .then(() => console.log('mongoose ok'))
+  .catch(() => console.log('mongoose error'));
 
 app.use((req, res, next) => {
   const error = new Error('Not found');
@@ -53,7 +60,12 @@ app.use((error, req, res, next) => {
     error: {
       message: error.message
     }
-  })
+  });
 });
 
 module.exports = app;
+
+httpServer.listen(4000);
+
+const io = socketIo(httpServer);
+global.io = io;

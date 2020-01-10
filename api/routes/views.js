@@ -7,8 +7,17 @@ const mongoose = require('mongoose');
 router.get('/:userId', (req, res, next) => {
   View
     .findOne({ _userId: req.params.userId }, { views: { $slice: -10 } })
+    .populate({ path: 'views' })
     .exec()
-    .then(result => res.status(200).json(result))
+    .then(result => {
+      if (!result) {
+        return res.status(201).json({
+          views: []
+        })
+      } else {
+        return res.status(200).json(result);
+      }
+    })
     .catch(error => res.status(500).json({ error }));
 });
 
