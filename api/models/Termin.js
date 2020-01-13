@@ -10,7 +10,10 @@ const terminSchema = Schema({
   },
   status: { type: Schema.Types.String },
   meta: {
-    userId: { type: Schema.Types.Number }
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
   }
 });
 
