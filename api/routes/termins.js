@@ -16,21 +16,47 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/:userId', (req, res, next) => {
+  Termin.find({ 'meta.user': req.params.userId })
+    .populate('meta.user')
+    .exec()
+    .then(response => {
+      res.status(200).json(response);
+    })
+    .catch(error => {
+      res.status(500).json({ error });
+    });
+});
+
+router.post('/', (req, res, next) => {
+  const { termin, userId } = req.body;
+
+  termin.meta = {
+    user: mongoose.Types.ObjectId(userId)
+  };
+
+  const t = new Termin({
+    ...termin,
+    _id: new mongoose.Types.ObjectId()
+  });
+
+  t.save()
+    .then(response => {
+      Termin.populate(response, { path: 'meta.user' })
+        .then(populatedResponse => {
+          res.status(200).json({ termin: populatedResponse });
+          global.io.emit('termin db insert', [populatedResponse]);
+        })
+        .catch(error => res.status(500).json(error));
+    })
+    .catch(error => res.status(500).json(error));
+});
+
 router.post('/send-request', (req, res, next) => {
   const list = req.body.terminList.map(termin => {
     termin.meta.user = mongoose.Types.ObjectId(termin.meta.user);
     return termin;
   });
-
-  // const user = await User.findOne({ _id: terminList[0].meta.user._id })
-
-  //   console.log({user})
-
-  // async function asyncForEach(array, callback) {
-  //   for (let index = 0; index < array.length; index++) {
-  //     await callback(array[index], index, array);
-  //   }
-  // }
 
   Termin.collection.insertMany(list).then(docs => {
     const ids = Object.values(docs.insertedIds);
@@ -48,8 +74,6 @@ router.post('/send-request', (req, res, next) => {
         res.status(500).json({ error });
       });
   });
-
-  // });
 });
 
 router.patch('/update-status', (req, res, next) => {

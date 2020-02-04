@@ -22,27 +22,24 @@ router.get(
 );
 
 router.post('/auth', (req, res, next) => {
-  const { error } = validate(req.body);
-
-  if (error) {
-    return res.status(400).send({
-      error: error.details[0].message
-    });
-  }
-
-  User.where({ 'socialMediaData.id': req.body.socialMediaData.id })
+  User.where({ 'socialMediaType.userID': req.body.user.socialMediaType.userID })
     .exec()
     .then(users => {
       if (users.length === 0) {
         const user = new User({
           _id: new mongoose.Types.ObjectId(),
-          name: req.body.name,
-          picture: req.body.picture,
-          email: req.body.email,
-          socialMediaData: {
-            id: req.body.socialMediaData.id,
-            name: req.body.socialMediaData.name
-          }
+          name: req.body.user.name,
+          email: req.body.user.email,
+          picture: {
+            url: req.body.user.picture.url,
+            width: req.body.user.picture.width,
+            height: req.body.user.picture.height
+          },
+          socialMediaType: {
+            userID: req.body.user.socialMediaType.userID,
+            type: req.body.user.socialMediaType.type
+          },
+          role: req.body.user.role
         });
 
         user
@@ -50,10 +47,7 @@ router.post('/auth', (req, res, next) => {
           .then(user => {
             const token = jwt.sign(
               {
-                _id: user.id,
-                picture: user.picture,
-                name: user.name,
-                email: user.email
+                ...user
               },
               process.env.JWT_SECRET_KEY,
               {
@@ -66,15 +60,15 @@ router.post('/auth', (req, res, next) => {
               token
             });
           })
-          .catch(error => res.status(500).json({ error: error }));
+          .catch(error => {
+            res.status(500).json({ error: 'erra' });
+          });
       } else {
-        const user = users[0];
+        const user = users[0].toObject();
+
         const token = jwt.sign(
           {
-            _id: user.id,
-            picture: user.picture,
-            name: user.name,
-            email: user.email
+            ...user
           },
           process.env.JWT_SECRET_KEY,
           {
@@ -107,7 +101,7 @@ router.post('/login', (req, res) => {
     .then(user => {
       if (!user) {
         return res.status(401).json({
-          error: "We couldn't find this one. "
+          message: "We couldn't find user with given details"
         });
       }
 
@@ -120,7 +114,7 @@ router.post('/login', (req, res) => {
           console.log(error);
           if (!response) {
             return res.status(400).json({
-              error: 'Username or password incorrect'
+              message: 'Username or password incorrect'
             });
           }
 
@@ -139,16 +133,82 @@ router.post('/login', (req, res) => {
           );
 
           return res.status(200).json({
-            success: 'Authentication successful.',
+            message: 'Authentication successful.',
             token
           });
         }
       );
     })
     .catch(() => {
-      res.status(500).json({ error: "We couldn't find this one." });
+      res.status(500).json({
+        message: "We couldn't find user with given details"
+      });
     });
 });
+
+router.post('/register', (req, res, next) => {
+  const user = new User({
+    _id: new mongoose.Types.ObjectId(),
+    ...req.body.user
+  });
+
+  user
+    .save()
+    .then(user => {
+      return res.status(200).json({
+        message: 'Registration successful.'
+      });
+    })
+    .catch(error => res.status(500).json({ message: error }));
+
+  // User.find({ email })
+  //   .exec()
+  //   .then(user => {
+  //     console.log('user', user);
+  //     if (user.length !== 0) {
+  //       res.status(404).json({
+  //         error: 'User already exist'
+  //       });
+  //     } else {
+  //       bcrypt.hash(req.body.password, null, null, (error, hash) => {
+  //         if (error) {
+  //           return res.status(500).json({ error: error });
+  //         } else {
+  //           req.body.password = hash;
+  //           const user = {
+  //             ...req.body
+  //           };
+
+  //           user
+  //             .save()
+  //             .then(user => {
+  //               console.log('succss');
+  //               return res.status(200).json(user);
+  //             })
+  //             .catch(() => {
+  //               return res.status(500).json({
+  //                 error: 'Error while trying to update user details.'
+  //               });
+  //             });
+  //         }
+  //       });
+
+  //       // res.status(200).json({
+  //       //   message: 'successfully registered',
+  //       //   user: {
+  //       //     email,
+  //       //     password
+  //       //   }
+  //       // });
+  //     }
+  //   })
+  //   .catch(() => {
+  //     res.status(500).json({
+  //       error: 'Oops, there was an error'
+  //     });
+  //   });
+});
+
 //
 // // User.remove({}, function(err) {
 // //   console.log('collection removed')
